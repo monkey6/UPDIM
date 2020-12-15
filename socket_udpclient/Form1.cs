@@ -12,6 +12,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
+using System.Configuration;
 
 namespace socket_udpclient
 {
@@ -69,6 +70,10 @@ namespace socket_udpclient
         public Form1()
         {
             InitializeComponent();
+            if(!(ConfigurationManager.AppSettings["LastIP"]=="Default"))
+            {
+                tbxRemoteIP.Text = ConfigurationManager.AppSettings["LastIP"];
+            }
             IPEndPoint localIpPoint = new IPEndPoint(IPAddress.Any, 51883);
             receiveClient = new UdpClient(localIpPoint);
             Thread receiveThread = new Thread(ReceiveMessage);
@@ -119,6 +124,12 @@ namespace socket_udpclient
             {
                 MessageBox.Show("请输入正确的IP地址", "提示");
                 return;
+            }
+            else
+            {
+                Configuration conf = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                conf.AppSettings.Settings["LastIP"].Value = tbxRemoteIP.Text;
+                conf.Save();
             }
 
             if (tbxMessage.Text == string.Empty)
